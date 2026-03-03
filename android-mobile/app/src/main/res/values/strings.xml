@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Student Calculator Mobile</string>
+    <string name="title">Student Grade Calculator</string>
+    <string name="excel_url_hint">Online Excel URL (.xlsx download link)</string>
+    <string name="sheet_hint">Scores sheet name (default: Scores)</string>
+    <string name="process_btn">Process Online Excel</string>
+    <string name="result_default">Result will appear here.</string>
+</resources>
