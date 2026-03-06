@@ -615,9 +615,14 @@ class GradeCalculatorGUI : JFrame("Grade Calculator") {
             aggregator = { list -> list.sum() / list.size }
         )
         val bonusResult = "With +$bonus bonus: Average = %.2f, Grade = %s".format(avgWithBonus, calculator.calculateGrade(avgWithBonus))
-
-        // Display in a dialog or in the original tab? For simplicity, show in a message.
-        JOptionPane.showMessageDialog(this, "$result\n$bonusResult", "Manual Entry Result", JOptionPane.INFORMATION_MESSAGE)
+        val manualTotals = scores.mapIndexed { index, score -> "Score ${index + 1}" to score }.toMap()
+        val exportsMessage = generateAllOutputs(listOf(StudentResult(name, manualTotals)))
+        JOptionPane.showMessageDialog(
+            this,
+            "$result\n$bonusResult\n\n$exportsMessage",
+            "Manual Entry Result",
+            JOptionPane.INFORMATION_MESSAGE
+        )
     }
 
     private fun chooseFile() {
@@ -628,11 +633,13 @@ class GradeCalculatorGUI : JFrame("Grade Calculator") {
             try {
                 val results = calculator.processFile(file)
                 if (results is List<*>) {
+                    val typedResults = results.filterIsInstance<StudentResult>()
                     // After processing, load the saved Excel file and display it
                     val savedFile = File("student_grades.xlsx")
                     if (savedFile.exists()) {
                         displayExcelFile(savedFile)
-                        statusBar.text = "Processed ${file.name} – saved as ${savedFile.absolutePath}"
+                        val exportsMessage = generateAllOutputs(typedResults)
+                        statusBar.text = "Processed ${file.name}. ${exportsMessage.replace('\n', ' ')}"
                     } else {
                         statusBar.text = "Processing completed, but output file not found."
                     }
@@ -655,10 +662,12 @@ class GradeCalculatorGUI : JFrame("Grade Calculator") {
             statusBar.text = "Downloaded to ${file.absolutePath}. Processing..."
             val results = calculator.processFile(file)
             if (results is List<*>) {
+                val typedResults = results.filterIsInstance<StudentResult>()
                 val savedFile = File("student_grades.xlsx")
                 if (savedFile.exists()) {
                     displayExcelFile(savedFile)
-                    statusBar.text = "Processed downloaded file – saved as ${savedFile.absolutePath}"
+                    val exportsMessage = generateAllOutputs(typedResults)
+                    statusBar.text = "Processed downloaded file. ${exportsMessage.replace('\n', ' ')}"
                 } else {
                     statusBar.text = "Processing completed, but output file not found."
                 }
@@ -687,6 +696,19 @@ class GradeCalculatorGUI : JFrame("Grade Calculator") {
             originalTextArea.text = "Error loading Excel file: ${ex.message}"
             gradesTextArea.text = ""
         }
+    }
+
+    private fun generateAllOutputs(results: List<StudentResult>): String {
+        if (results.isEmpty()) return "No output generated: no student rows were parsed."
+        val excel = calculator.generateOutput(results, OutputFormat.EXCEL)
+        val pdf = calculator.generateOutput(results, OutputFormat.PDF)
+        val html = calculator.generateOutput(results, OutputFormat.HTML)
+        return buildString {
+            appendLine("Generated files:")
+            appendLine("Excel: ${excel.absolutePath}")
+            appendLine("PDF: ${pdf.absolutePath}")
+            appendLine("HTML: ${html.absolutePath}")
+        }.trim()
     }
 
     private fun sheetToText(sheet: org.apache.poi.ss.usermodel.Sheet): String {
