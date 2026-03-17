@@ -9,10 +9,8 @@ This repository now contains:
 
 - `src/main/kotlin/org/example/Main.kt`
 - `run-console.bat` (safe Windows launcher for console app)
-- `android-mobile/` (Android Studio mobile app project)
-
-## Console App Features
-
+- `android-mobile/` (Android Studio mobile app proje App Features
+## Web app
 - Manual console grading from entered scores.
 - Excel/CSV mode:
   - reads local or online `.xlsx` or `.csv`,
@@ -101,6 +99,10 @@ Features:
 3. Let Gradle sync complete.
 4. Create/start an emulator (or connect Android device with USB debugging).
 5. Click `Run`.
+6. Not functioning yet
+
+##Web design
+1. The GUI design is implemented in the Main.kt
 
 ## Important for Excel Online Links
 
